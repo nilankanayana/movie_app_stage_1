@@ -6,6 +6,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
 
+import com.inusak.android.moviesapp.BuildConfig;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -28,18 +30,18 @@ public class NetworkUtils {
     /**
      * discover movies
      */
-    private static final String DEFAULT_ROOT_URL_DISCOVER_MOVIES = "https://api.themoviedb.org/3/discover/movie";
+    private static final String DEFAULT_ROOT_URL_DISCOVER_MOVIES = "https://api.themoviedb.org/3/movie";
 
     private static final String API_KEY = "api_key";
 
     // TODO: PLEASE ADD YOUR API_KEY HERE
-    private static final String API_KEY_VALUE = "";
+    private static final String API_KEY_VALUE = BuildConfig.API_KEY;
 
-    private static final String MOST_POPULAR_SEARCH = "popularity.desc";
+    private static final String MOST_POPULAR_SEARCH = "popular";
 
     private static final int MOST_POPULAR_SWITCH = 0;
 
-    private static final String HIGHEST_RATED_SEARCH = "vote_average.desc";
+    private static final String HIGHEST_RATED_SEARCH = "top_rated";
 
     private static final int HIGHEST_RATED_SWITCH = 1;
 
@@ -62,8 +64,8 @@ public class NetworkUtils {
      */
     public static URL buildUrl(int searchSwitch) {
         Uri builtUri = Uri.parse(DEFAULT_ROOT_URL_DISCOVER_MOVIES).buildUpon()
+                .appendPath(getSearchTagFromSwitch(searchSwitch))
                 .appendQueryParameter(API_KEY, API_KEY_VALUE)
-                .appendQueryParameter(SORT_BY, getSearchTagFromSwitch(searchSwitch))
                 .build();
 
         URL url = null;
@@ -114,7 +116,7 @@ public class NetworkUtils {
         final ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         final NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnected();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     /**

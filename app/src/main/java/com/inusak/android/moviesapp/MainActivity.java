@@ -110,14 +110,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void loadMovieData() {
         setMovieDataViewsVisible();
 
-        // async task creation and execution
-        new FetchMovieDataTask().execute(searchSpinner.getSelectedItemPosition());
+        // no network scenario
+        if (NetworkUtils.isOnline(MainActivity.this)) {
+            // async task creation and execution
+            new FetchMovieDataTask(this).execute(searchSpinner.getSelectedItemPosition());
+        } else {
+            setErrorViewsVisible();
+        }
     }
 
     /**
      * This method sets movie data views visible
      */
-    private void setMovieDataViewsVisible() {
+    public void setMovieDataViewsVisible() {
         errorTextView.setVisibility(View.INVISIBLE);
         recylerView.setVisibility(View.VISIBLE);
     }
@@ -125,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     /**
      * This method sets error views visible
      */
-    private void setErrorViewsVisible() {
+    public void setErrorViewsVisible() {
         recylerView.setVisibility(View.INVISIBLE);
         errorTextView.setVisibility(View.VISIBLE);
     }
@@ -154,59 +159,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         startActivity(intent);
     }
 
-    /**
-     * This class handles background data loading from movie db api.
-     */
-    private class FetchMovieDataTask extends AsyncTask<Integer, Void, List<MovieData>> {
+    public ProgressBar getLoadingProgress() {
+        return loadingProgress;
+    }
 
-        @Override
-        protected List<MovieData> doInBackground(Integer... params) {
-            // no params specified
-            if (params.length == 0) {
-                return null;
-            }
-
-            // no network scenario
-            if (!NetworkUtils.isOnline(MainActivity.this)) {
-                return null;
-            }
-
-            // first param
-            final int searchSwitch = params[0];
-            // generate url
-            final URL movieDataUrl = NetworkUtils.buildUrl(searchSwitch);
-
-            try {
-                // load json data string
-                final String movieDataJsonString = NetworkUtils.getResponseFromHttpUrl(movieDataUrl);
-                // convert to list of movie data
-                return MovieDataJsonUtils.getMovieDataFromJson(MainActivity.this, movieDataJsonString);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            loadingProgress.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(List<MovieData> movieDataList) {
-            super.onPostExecute(movieDataList);
-            loadingProgress.setVisibility(View.INVISIBLE);
-
-            if (movieDataList != null && !movieDataList.isEmpty()) {
-                // if data is available from background task set data to adapter
-                setMovieDataViewsVisible();
-                movieDataAdapter.setMovieData(movieDataList);
-            } else {
-                // display error message to user
-                setErrorViewsVisible();
-            }
-        }
+    public MovieDataAdapter getMovieDataAdapter() {
+        return movieDataAdapter;
     }
 }
