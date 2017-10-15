@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Movies</string>
+    <string name="error_message">An error has occurred. Please check the network connections and retry refreshing.</string>
+    <string name="sort_by">Sort by:</string>
+    <string name="refresh">Reload</string>
+    <string name="movie_poster">movie poster</string>
+    <string name="rating">Rating:</string>
+    <string name="release_date">Release Date:</string>
+    <string-array name="search_types">
+        <item>Most Popular</item>
+        <item>Highest Rated</item>
+    </string-array>
+</resources>
